@@ -3,9 +3,21 @@
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
-
 from modules import conf
 from modules import viewer
+
+cat_emoticon = """
+             ∧＿∧         ／￣￣￣￣￣￣￣￣
+            （  ´∀｀)  ＜    Welcome!
+         /           |     ＼    I'm your cat of
+        /            .|　    ＼    the day!
+       / "⌒ヽ  |.ｲ |           ＼＿＿＿＿＿＿＿＿
+ ＿＿ |     .ノ | || |＿＿
+     ノく＿＿つ∪∪      ＼
+  ＿（（＿＿＿＿＿＿＿＿＼
+ ￣￣ヽつ￣￣￣￣￣￣ | |￣
+                      |f u z z y|
+"""
 
 class MainFrame(QtGui.QWidget):
 
@@ -48,8 +60,8 @@ class MainFrame(QtGui.QWidget):
         self.grid.addWidget(self._title["id"], 0, 0)
         self.grid.addWidget(self._title["pwd"], 1, 0)
 
-        self.grid.addWidget(self._textbox["id"], 0, 1, 1, 4)
-        self.grid.addWidget(self._textbox["pwd"], 1, 1, 1, 4)
+        self.grid.addWidget(self._textbox["id"], 0, 1, 1, 3)
+        self.grid.addWidget(self._textbox["pwd"], 1, 1, 1, 3)
 
         self.grid.addWidget(self._title["interval"], 2, 0)
         self.grid.addWidget(self._title["cnt"], 3, 0)
@@ -61,6 +73,8 @@ class MainFrame(QtGui.QWidget):
         self.grid.addWidget(self._spinbox["pool"], 2, 3)
 
         self.grid.addWidget(self._btn["run"], 3, 2, 1, 2)
+
+        self.grid.addWidget(self._textbox["status"], 4, 0, 5, 4)
 
 
     def connect_activity(self):
@@ -79,6 +93,10 @@ class MainFrame(QtGui.QWidget):
         self._textbox["pwd"] = QtGui.QLineEdit(self)
         self._textbox["pwd"].setEchoMode(QtGui.QLineEdit.Password)
 
+        self._textbox["status"] = QtGui.QTextEdit(self)
+        self._textbox["status"].setReadOnly(True)
+        self._textbox["status"].setLineWrapMode(QtGui.QTextEdit.NoWrap)
+        self._textbox["status"].insertPlainText(cat_emoticon)
 
     def set_title(self):
         self.setWindowTitle("Eclass' Got Talent")
