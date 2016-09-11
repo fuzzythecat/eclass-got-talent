@@ -4,9 +4,11 @@
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 from modules import conf
-from modules import viewer
+from modules import network
 
-cat_emoticon = """
+cat_emoticon = {}
+
+cat_emoticon["welcome"] = """
              ∧＿∧         ／￣￣￣￣￣￣￣￣
             （  ´∀｀)  ＜    Welcome!
          /           |     ＼    I'm your cat of
@@ -16,8 +18,76 @@ cat_emoticon = """
      ノく＿＿つ∪∪      ＼
   ＿（（＿＿＿＿＿＿＿＿＼
  ￣￣ヽつ￣￣￣￣￣￣ | |￣
-                      |f u z z y|
+        ^ ＿＿＿＿＿
+      /   I'm fuzzy.  ＼
+       ＼＿＿＿＿＿＿/
+
 """
+
+cat_emoticon["connection_error"] = """
+             ∧＿∧         ／￣￣￣￣￣￣￣￣
+            （  ´∀｀)  ＜    Connection Failure!
+         /           |     ＼    Check for network
+        /            .|　    ＼    connection!
+       / "⌒ヽ  |.ｲ |           ＼＿＿＿＿＿＿＿＿
+ ＿＿ |     .ノ | || |＿＿
+     ノく＿＿つ∪∪      ＼
+  ＿（（＿＿＿＿＿＿＿＿＼
+ ￣￣ヽつ￣￣￣￣￣￣ | |￣
+        ^ ＿＿＿＿＿
+      /   I'm fuzzy.  ＼
+       ＼＿＿＿＿＿＿/
+
+"""
+
+cat_emoticon["login_error"] = """
+             ∧＿∧         ／￣￣￣￣￣￣￣￣
+            （  ´∀｀)  ＜    Log-in Failure!
+         /           |     ＼    Check for ID ||
+        /            .|　    ＼    password!
+       / "⌒ヽ  |.ｲ |           ＼＿＿＿＿＿＿＿＿
+ ＿＿ |     .ノ | || |＿＿
+     ノく＿＿つ∪∪      ＼
+  ＿（（＿＿＿＿＿＿＿＿＼
+ ￣￣ヽつ￣￣￣￣￣￣ | |￣
+        ^ ＿＿＿＿＿
+      /   I'm fuzzy.  ＼
+       ＼＿＿＿＿＿＿/
+
+"""
+
+cat_emoticon["complete"] = """
+             ∧＿∧         ／￣￣￣￣￣￣￣￣
+            （  ´∀｀)  ＜    Process complete!
+         /           |     ＼    You did the right thing.
+        /            .|　    ＼    He deserved more views.
+       / "⌒ヽ  |.ｲ |           ＼＿＿＿＿＿＿＿＿
+ ＿＿ |     .ノ | || |＿＿
+     ノく＿＿つ∪∪      ＼
+  ＿（（＿＿＿＿＿＿＿＿＼
+ ￣￣ヽつ￣￣￣￣￣￣ | |￣
+        ^ ＿＿＿＿＿
+      /   I'm fuzzy.  ＼
+       ＼＿＿＿＿＿＿/
+
+"""
+
+cat_emoticon["counting"] = """
+             ∧＿∧         ／￣￣￣￣￣￣￣￣
+            （  ´∀｀)  ＜    Processing ...
+         /           |     ＼    ? / ? ...
+        /            .|　    ＼    Please wait
+       / "⌒ヽ  |.ｲ |           ＼＿＿＿＿＿＿＿＿
+ ＿＿ |     .ノ | || |＿＿
+     ノく＿＿つ∪∪      ＼
+  ＿（（＿＿＿＿＿＿＿＿＼
+ ￣￣ヽつ￣￣￣￣￣￣ | |￣
+        ^ ＿＿＿＿＿
+      /   I'm fuzzy.  ＼
+       ＼＿＿＿＿＿＿/
+
+"""
+
 
 class MainFrame(QtGui.QWidget):
 
@@ -96,7 +166,13 @@ class MainFrame(QtGui.QWidget):
         self._textbox["status"] = QtGui.QTextEdit(self)
         self._textbox["status"].setReadOnly(True)
         self._textbox["status"].setLineWrapMode(QtGui.QTextEdit.NoWrap)
-        self._textbox["status"].insertPlainText(cat_emoticon)
+
+        if network.check_network_connection():
+            self._textbox["status"].setPlainText(cat_emoticon["welcome"])
+        else:
+            self._textbox["status"].setPlainText(cat_emoticon["connection_error"])
+        self._textbox["status"].moveCursor(QtGui.QTextCursor.Start)
+
 
     def set_title(self):
         self.setWindowTitle("Eclass' Got Talent")
@@ -165,10 +241,25 @@ class MainFrame(QtGui.QWidget):
 
 
     def run(self):
-        cookie = viewer.authorize_session(self.data, self.headers)
+        import time
+
+        if not network.check_network_connection():
+            self._textbox["status"].setPlainText(cat_emoticon["connection_error"])
+            return
+
+        cookie = network.authorize_session(self.data, self.headers)
 
         if len(cookie) == 0:
-            print("login error")
+            self._textbox["status"].setPlainText(cat_emoticon["login_error"])
+            return
         else:
+            """
+            cat_emoticon["counting"].replace("?", "0", 1)
+            cat_emoticon["counting"].replace("?", str(self.view_count), 1)
+            self._textbox["status"].setPlainText(cat_emoticon["counting"])
+            """
+
             for i in range(self.view_count):
-                viewer.request_lecture(cookie, self.interval)
+                network.request_lecture(cookie, self.interval)
+
+        self._textbox["status"].setPlainText(cat_emoticon["complete"])
