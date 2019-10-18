@@ -6,4 +6,4 @@ query-string==0.0.11
 requests==2.11.1
 setupfiles==0.0.13
 sip==4.18.1
-urllib3==1.17
+urllib3==1.24.2
