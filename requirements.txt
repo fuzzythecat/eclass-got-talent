@@ -3,7 +3,7 @@ get==0.0.20
 post==0.0.12
 public==0.0.37
 query-string==0.0.11
-requests==2.20.0
+requests==2.31.0
 setupfiles==0.0.13
 sip==4.18.1
 urllib3==1.26.5
